@@ -1,11 +1,12 @@
 - hosts: all
-  tasks:
-  - name: yell out loud
-    command: echo "LOUUUUDDDD"
-    notify:
-    - whoami really
-  - name: show me files
-    command: ls
   handlers:
   - name: whoami really
     command: whoami
+  tasks:
+  - name: yell out loud
+    command: echo "LOUUUUDDDD{{ item }}"
+    with_sequence: start=4 end=6
+    notify:
+    - whoami really
+  - name: show me files
+    command: sleep 1
