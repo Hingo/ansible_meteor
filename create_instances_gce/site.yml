@@ -3,12 +3,12 @@
   connection: local
   gather_facts: False
   vars:
-    names: mm1,vh1
+    names: mm2
     machine_type: f1-micro
     image: ubuntu-1204-precise-v20150625
     zone: europe-west1-d
     service_account_email: 547143891756-08ihrtbkhvvas21qm88kvbhv7i47mv87@developer.gserviceaccount.com
-    pem_file: /Users/d062844/Documents/Private/Ansible/Code/ansible_meteor/pkey.pem
+    pem_file: ../pkey.pem
     project_id: fancystuff-11
   tasks:
     - name: Launch instances
