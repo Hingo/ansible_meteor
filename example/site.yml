@@ -1,0 +1,11 @@
+- hosts: all
+  tasks:
+  - name: yell out loud
+    command: echo "LOUUUUDDDD"
+    notify:
+    - whoami really
+  - name: show me files
+    command: ls
+  handlers:
+  - name: whoami really
+    command: whoami
