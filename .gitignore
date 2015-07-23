@@ -1,0 +1,3 @@
+# do not push the pkey.pem file
+ pkey.pem
+.idea
