@@ -1,0 +1,33 @@
+- name: Create a sandbox instance
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  vars:
+    names: mm1,vh1
+    machine_type: f1-micro
+    image: ubuntu-1204-precise-v20150625
+    zone: europe-west1-d
+    service_account_email: 547143891756-08ihrtbkhvvas21qm88kvbhv7i47mv87@developer.gserviceaccount.com
+    pem_file: /Users/d062844/Documents/Private/Ansible/Code/ansible_meteor/pkey.pem
+    project_id: fancystuff-11
+  tasks:
+    - name: Launch instances
+      local_action: gce instance_names={{names}} machine_type={{machine_type}}
+                    image={{image}} zone={{zone}} service_account_email={{ service_account_email }}
+                    pem_file={{ pem_file }} project_id={{ project_id }}
+      register: gce
+##- name: Configure instance(s)
+##  hosts: launched
+##  sudo: True
+##  roles:
+##    - my_awesome_role
+##    - my_awesome_tasks
+##- name: Terminate instances
+##  hosts: localhost
+##  connection: local
+##  tasks:
+##    - name: Terminate instances that were previously launched
+##      local_action:
+##        module: gce
+##        state: 'absent'
+##        instance_names: {{gce.instance_names}}
