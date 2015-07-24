@@ -1,0 +1,39 @@
+---
+- name: prepare cloud infrastructure
+  hosts: localhost
+  connection: local
+  vars:
+    names: mm3
+    machine_type: f1-micro
+    image: ubuntu-1204-precise-v20150625
+    zone: europe-west1-d
+    email: 547143891756-08ihrtbkhvvas21qm88kvbhv7i47mv87@developer.gserviceaccount.com
+    pem_file: ../pkey.pem
+    project_id: fancystuff-11
+  tasks:
+  - name: install libcloud
+    pip: name=apache-libcloud
+  - name: launch gce instances
+    gce:
+      instance_names: "{{ names }}"
+      machine_type: "{{ machine_type }}"
+      image: "{{ image }}"
+      zone: "{{ zone }}"
+      service_account_email: "{{ email }}"
+      project_id: "{{ project_id }}"
+      pem_file: "{{ pem_file }}"
+    register: gce
+  - name: wait for SSH of gce instances to come up
+    wait_for: host={{ item.public_ip }} port=22 delay=10 timeout=60
+    with_items: gce.instance_data
+  - name: add gce instances to hosts
+    add_host: hostname={{ item.public_ip }} groupname=launched
+    with_items: gce.instance_data
+
+- name: prepare cloud instances
+  hosts: launched
+  connection: ssh
+  sudo: True
+  tasks:
+  - name: install meteor
+    command: curl https://install.meteor.com/ | sh

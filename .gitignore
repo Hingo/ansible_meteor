@@ -3,3 +3,4 @@ pkey.pem
 .idea
 pkey.pkcs12
 gce.ini
+ca-bundle.crt

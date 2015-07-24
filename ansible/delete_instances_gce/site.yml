@@ -7,18 +7,16 @@
     image: ubuntu-1204-precise-v20150625
     zone: europe-west1-d
     email: 547143891756-08ihrtbkhvvas21qm88kvbhv7i47mv87@developer.gserviceaccount.com
-    pem_file: ~/git/ansible_meteor/pkey.pem
+    pem_file: ../pkey.pem
     project_id: fancystuff-11
   tasks:
   - name: install libcloud
     pip: name=apache-libcloud
-  - name: Launch instances
+  - name: Terminate instances
     gce:
       instance_names: "{{ names }}"
-      machine_type: "{{ machine_type }}"
-      image: "{{ image }}"
       zone: "{{ zone }}"
       service_account_email: "{{ email }}"
       project_id: "{{ project_id }}"
       pem_file: "{{ pem_file }}"
-
+      state: "deleted"
