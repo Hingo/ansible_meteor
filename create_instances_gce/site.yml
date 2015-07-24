@@ -2,7 +2,7 @@
 - hosts: localhost
   connection: local
   vars:
-    names: mm2
+    names: mm3
     machine_type: f1-micro
     image: ubuntu-1204-precise-v20150625
     zone: europe-west1-d

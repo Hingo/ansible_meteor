@@ -1,5 +1,5 @@
 # do not push the pkey.pem file
- pkey.pem
+pkey.pem
 .idea
 pkey.pkcs12
 gce.ini

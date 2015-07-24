@@ -1,0 +1,13 @@
+## example inventory hot file for gce test
+###vh-voreos-1 ansible_ssh_host=104.155.26.0
+###vh-testmachine ansible_ssh_host=104.155.39.93
+
+###[test]
+###vh-testmachine
+
+###[voreos]
+###vh-voreos-1
+
+###[voreos:vars]
+###ansible_ssh_user=core
+###ansible_python_interpreter="PATH=/home/core/bin:$PATH python"
