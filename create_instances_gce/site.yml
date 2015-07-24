@@ -1,21 +1,36 @@
-- name: Create a sandbox instance
-  hosts: localhost
+---
+- hosts: localhost
   connection: local
-  gather_facts: False
   vars:
     names: mm2
     machine_type: f1-micro
     image: ubuntu-1204-precise-v20150625
     zone: europe-west1-d
-    service_account_email: 547143891756-08ihrtbkhvvas21qm88kvbhv7i47mv87@developer.gserviceaccount.com
-    pem_file: ../pkey.pem
+    email: 547143891756-08ihrtbkhvvas21qm88kvbhv7i47mv87@developer.gserviceaccount.com
+    pem_file: ~/git/ansible_meteor/pkey.pem
     project_id: fancystuff-11
   tasks:
-    - name: Launch instances
-      local_action: gce instance_names={{names}} machine_type={{machine_type}}
-                    image={{image}} zone={{zone}} service_account_email={{ service_account_email }}
-                    pem_file={{ pem_file }} project_id={{ project_id }}
-      register: gce
+  - name: install libcloud
+    pip: name=apache-libcloud
+  - name: test py import
+    command: ~/git/ansible_meteor/create_instances_gce/test.py
+  - name: Getting PYTHONPATH
+    local_action: shell python -c 'import sys; print(":".join(sys.path))'
+    register: pythonpath
+  - debug:  
+      msg: "PYTHONPATH: {{ pythonpath.stdout }}"
+  - name: show email
+    command: echo "{{email}}"  
+  - name: Launch instances
+    gce:
+      instance_names: "{{ names }}"
+      machine_type: "{{ machine_type }}"
+      image: "{{ image }}"
+      zone: "{{ zone }}"
+      service_account_email: "{{ email }}"
+      project_id: "{{ project_id }}"
+      pem_file: "{{ pem_file }}"
+
 ##- name: Configure instance(s)
 ##  hosts: launched
 ##  sudo: True
