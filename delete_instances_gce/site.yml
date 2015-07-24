@@ -12,13 +12,11 @@
   tasks:
   - name: install libcloud
     pip: name=apache-libcloud
-  - name: Launch instances
+  - name: Terminate instances
     gce:
       instance_names: "{{ names }}"
-      machine_type: "{{ machine_type }}"
-      image: "{{ image }}"
       zone: "{{ zone }}"
       service_account_email: "{{ email }}"
       project_id: "{{ project_id }}"
       pem_file: "{{ pem_file }}"
-
+      state: "deleted"
