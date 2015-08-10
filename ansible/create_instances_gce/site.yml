@@ -8,7 +8,7 @@
     image: ubuntu-1204-precise-v20150625
     zone: europe-west1-d
     email: 547143891756-08ihrtbkhvvas21qm88kvbhv7i47mv87@developer.gserviceaccount.com
-    pem_file: ../pkey.pem
+    pem_file: /Users/d046179/git/ansible_meteor/ansible/unfancystuff-ed917d3b473a.pem
     project_id: fancystuff-11
   tasks:
   - name: install libcloud
@@ -37,3 +37,7 @@
   tasks:
   - name: install meteor
     command: curl https://install.meteor.com/ | sh
+  - name: upload meteor example app
+    copy: src=/Users/d046179/git/ansible_meteor/todo_example_app dest=~/
+  - name: build meteor
+    command: meteor build ~/todo_example_app
