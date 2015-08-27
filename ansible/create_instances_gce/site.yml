@@ -32,7 +32,6 @@
 
 - name: prepare cloud instances
   hosts: launched
-  connection: ssh
   sudo: True
   tasks:
   - name: install meteor
