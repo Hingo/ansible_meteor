@@ -4,8 +4,6 @@
   connection: local
   gather_facts: False
   vars:
-    ec2_access_key: AKIAIVOD33X45YM5X6DQ
-    ec2_secret_key: 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
     key_name: vineet-michael-ansible
     instance_type: t2.micro
     image: ami-d05e75b8
