@@ -98,4 +98,6 @@
   - name: download meteor example app
     git: repo=https://github.com/Hingo/ansible_meteor.git dest=~/ansible_meteor/
   - name: build meteor
-    command: cd ~/ansible_meteor/todo_example_app; meteor build
+    command: cd ~/ansible_meteor/todo_example_app
+  - name: build meteor
+    command: meteor build
