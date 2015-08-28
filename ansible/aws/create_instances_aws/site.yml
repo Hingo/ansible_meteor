@@ -2,7 +2,7 @@
 - name: prepare cloud infrastructure
   hosts: localhost
   connection: local
-  gather_facts: False
+  gather_facts: True
   vars:
     key_name: vineet-michael-ansible
     instance_type: t2.micro
@@ -11,7 +11,11 @@
   tasks:
   - name: install boto
     pip: name=boto
-
+  - name: gather ec2 facts
+    action: ec2_facts
+    register: ec2facts
+  - name: all ec2 instances
+    debug: var=ec2facts
   - name: create a virtual private cloud (vpc)
     ec2_vpc:
       state: present
@@ -95,7 +99,8 @@
     get_url: url=https://install.meteor.com/ dest=~/meteor_install
   - name: install meteor
     command: sh ~/meteor_install
-  - name: upload meteor example app
-    copy: src=/Users/d046179/git/ansible_meteor/todo_example_app dest=~/
+  - apt: name=git update_cache=yes
+  - name: download meteor example app
+    git: repo=https://github.com/Hingo/ansible_meteor.git dest=~/ansible_meteor/
   - name: build meteor
-    command: cd ~/todo_example_app; meteor build ~/todo_example_app
+    command: cd ~/ansible_meteor/todo_example_app; meteor build
