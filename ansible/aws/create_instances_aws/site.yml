@@ -11,11 +11,6 @@
   tasks:
   - name: install boto
     pip: name=boto
-  - name: gather ec2 facts
-    action: ec2_facts
-    register: ec2facts
-  - name: all ec2 instances
-    debug: var=ec2facts
   - name: create a virtual private cloud (vpc)
     ec2_vpc:
       state: present
@@ -61,8 +56,8 @@
           to_port: 80
           cidr_ip: 0.0.0.0/0
     register: ec2group
-  - name: show group id
-    debug: var=ec2group
+#  - name: show group id
+#    debug: var=ec2group
   - name: launch aws ec2 instances
     ec2:
       key_name: "{{key_name}}"
