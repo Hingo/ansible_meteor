@@ -1,0 +1,43 @@
+---
+- name: destruct cloud infrastructure
+  hosts: localhost
+  connection: local
+  gather_facts: True
+  vars:
+    key_name: vineet-michael-ansible
+    instance_type: t2.micro
+    image: ami-d05e75b8
+    region: us-east-1
+  tasks:
+  - name: install boto
+    pip: name=boto
+  - name: destroy the "Demo-ELB" elastic load balancer (elb)
+    ec2_elb_lb:
+      state: absent
+      name: "Demo-ELB"
+      region: "{{region}}"
+  - name: destroy aws ec2 instances with tag "Name:Demo"
+    ec2:
+      region: "{{region}}"
+      image: "{{image}}"
+      wait: true
+      instance_tags:
+        Name: Demo
+      exact_count: 0
+      count_tag:
+        Name: Demo
+    register: ec2
+  - name: destroy the "vineet-is-secure" security group
+    ec2_group:
+      state: absent
+      name: vineet-is-secure
+      description: vineet is a hulk bouncer!
+      region: "{{region}}"
+    register: ec2group
+  - name: destroy the "env:dev" virtual private cloud (vpc)
+    ec2_vpc:
+      state: absent
+      resource_tags: { "env": "dev" }
+      cidr_block: 10.0.0.0/16
+      region: "{{region}}"
+
