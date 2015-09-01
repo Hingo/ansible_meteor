@@ -103,7 +103,8 @@
     async: 999999
     poll: 0
   - name: start meteor app service
-    command: service start meteor-app
+    service: name=meteor-app state=started
+    sudo: true
 
 - name: enable ec2 instanes
   hosts: localhost
@@ -117,10 +118,11 @@
   - name: generate list of subnet ids
     set_fact: subnet_ids={{subnet_ids}} + [{{item.id}}]
     with_items: "{{ec2vpc.subnets}}"
+  - debug: var=subnet_ids
   - name: create elastic load balancer (elb)
     ec2_elb_lb:
       name: "Demo-ELB"
-      subnets: "{{subnet_ids}}" 
+      subnets: ["{{ec2vpc.subnets[0].id}}", "{{ec2vpc.subnets[1].id}}", "{{ec2vpc.subnets[2].id}}"]
 #        - "{{item.id}}"
       region: "{{region}}"
       health_check:
