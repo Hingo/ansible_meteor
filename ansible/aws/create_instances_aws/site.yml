@@ -113,17 +113,10 @@
   vars:
     region: us-east-1
   tasks:
-  - name: init list of subnet ids
-    set_fact: subnet_ids="[]"
-  - name: generate list of subnet ids
-    set_fact: subnet_ids={{subnet_ids}} + [{{item.id}}]
-    with_items: "{{ec2vpc.subnets}}"
-  - debug: var=subnet_ids
   - name: create elastic load balancer (elb)
     ec2_elb_lb:
       name: "Demo-ELB"
-      subnets: ["{{ec2vpc.subnets[0].id}}", "{{ec2vpc.subnets[1].id}}", "{{ec2vpc.subnets[2].id}}"]
-#        - "{{item.id}}"
+      subnets: ["{{ec2vpc.subnets[0].id}}"]
       region: "{{region}}"
       health_check:
         ping_protocol: http
@@ -138,7 +131,6 @@
           load_balancer_port: 80
           instance_port: 3000
       state: present
-#    with_items: "{{ec2vpc.subnets}}"
   - name: register ec2 instances with elb
     ec2_elb:
       instance_id: "{{item.id}}"
