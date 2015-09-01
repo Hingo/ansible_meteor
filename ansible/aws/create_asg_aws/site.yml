@@ -17,7 +17,7 @@
       cidr_block: 10.0.0.0/16
       internet_gateway: yes
       region: "{{region}}"
-      resource_tags: { "env": "dev" }
+      resource_tags: { "Name": "Demo-ASG", "env": "dev" }
       subnets:
         - cidr: 10.0.1.0/24
           az: us-east-1a
@@ -103,13 +103,14 @@
   - name: create aws ec2 auto scaler
     ec2_asg:
       name: "Demo-ASG"
-      default_cooldown: 3000
       min_size: 1
       max_size: 5
-	  launch_config_name: Demo-ASG-LC
+      launch_config_name: Demo-ASG-LC
       load_balancers: ["Demo-ASG-ELB"]
       health_check_type: ELB
       vpc_zone_identifier: ["{{ec2vpc.subnets[0].id}}"]
+      tags: 
+        - env: "dev"
       region: "{{region}}"
       state: present
     register: ec2asg
@@ -120,19 +121,20 @@
       scaling_adjustment: 1
       min_adjustment_step: 1
       adjustment_type: "ChangeInCapacity"
+      cooldown: 3000
       region: "{{region}}"
       state: present
     register: ec2asgpolicy
   - name: define aws ec2 auto scaling alarm/trigger
     ec2_metric_alarm:
       name: "Demo-ASG-CPU-high-alarm"
-      alarm_actions: ["Demo-ASG-Scale-Up"]
+      alarm_actions: ["{{ ec2asgpolicy.arn }}"]
       dimensions: {"AutoScalingGroupName":"Demo-ASG"}
       metric: "CPUUtilization"
       namespace: "AWS/EC2"
       statistic: Average
-	  comparison: ">="
-      threshold: 90
+      comparison: ">="
+      threshold: 90.0
       unit: "Percent"
       period: 60
       evaluation_periods: 2

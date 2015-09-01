@@ -2,7 +2,7 @@
 - name: destruct cloud infrastructure
   hosts: localhost
   connection: local
-  gather_facts: True
+  gather_facts: False
   vars:
     key_name: vineet-michael-ansible
     instance_type: t2.micro
@@ -11,33 +11,53 @@
   tasks:
   - name: install boto
     pip: name=boto
+  - name: delete aws ec2 auto scaling alarm/trigger
+    ec2_metric_alarm:
+      name: "Demo-ASG-CPU-high-alarm"
+      region: "{{region}}"
+      state: absent
+#  - name: delete aws ec2 auto scale up policy
+#    ec2_scaling_policy:
+#      name: "Demo-ASG-Scale-Up"
+#      asg_name: "Demo-ASG"
+#      region: "{{region}}"
+#      state: absent
+  - name: destroy aws ec2 auto scaler
+    ec2_asg:
+      name: "Demo-ASG"
+      region: "{{region}}"
+      state: absent
+  - name: destroy aws ec2 launch configuration
+    ec2_lc:
+      name: Demo-ASG-LC
+      region: "{{region}}"
+      state: absent
+  - name: destroy elastic load balancer (elb)
+    ec2_elb_lb:
+      name: "Demo-ASG-ELB"
+      region: "{{region}}"
+      state: absent
   - name: destroy the "Demo-ELB" elastic load balancer (elb)
     ec2_elb_lb:
       state: absent
       name: "Demo-ELB"
       region: "{{region}}"
-  - name: destroy aws ec2 instances with tag "Name:Demo"
-    ec2:
-      region: "{{region}}"
-      image: "{{image}}"
-      wait: true
-      instance_tags:
-        Name: Demo
-      exact_count: 0
-      count_tag:
-        Name: Demo
-    register: ec2
-  - name: destroy the "vineet-is-secure" security group
+  - name: destroy a security group for the elb
     ec2_group:
       state: absent
-      name: vineet-is-secure
+      name: vineet-is-secure-asg-elb
       description: vineet is a hulk bouncer!
       region: "{{region}}"
-    register: ec2group
+  - name: destroy the "vineet-is-secure-asg" security group
+    ec2_group:
+      state: absent
+      name: vineet-is-secure-asg
+      description: vineet is a hulk bouncer!
+      region: "{{region}}"
   - name: destroy the "env:dev" virtual private cloud (vpc)
     ec2_vpc:
       state: absent
-      resource_tags: { "env": "dev" }
+      resource_tags: { "Name": "Demo-ASG", "env": "dev" }
       cidr_block: 10.0.0.0/16
       region: "{{region}}"
 
