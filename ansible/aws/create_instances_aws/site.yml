@@ -88,20 +88,17 @@
   gather_facts: true
   tasks:
   - name: download meteor
-    get_url: url=https://install.meteor.com/ dest=~/meteor_install
+    get_url: url=https://install.meteor.com/ dest=/home/ubuntu/meteor_install
   - name: install meteor
-    command: sh ~/meteor_install
+    command: sh /home/ubuntu/meteor_install
+	sudo: true
   - apt: name=git update_cache=yes
     sudo: true
   - name: download meteor example app
-    git: repo=https://github.com/Hingo/ansible_meteor.git dest=~/ansible_meteor/
+    git: repo=https://github.com/Hingo/ansible_meteor.git dest=/home/ubuntu/ansible_meteor/
   - name: copy startup meteor app service
     copy: src=meteor-app.conf dest=/etc/init/
     sudo: true
-  - name: run meteor app
-    shell: chdir=~/ansible_meteor/todo_example_app nohup meteor run --production
-    async: 999999
-    poll: 0
   - name: start meteor app service
     service: name=meteor-app state=started
     sudo: true
