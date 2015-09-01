@@ -37,7 +37,7 @@
             - dest: 0.0.0.0/0
               gw: igw
     register: ec2vpc
-  - name: create a security group
+  - name: create a security group for the vpc
     ec2_group:
       state: present
       name: vineet-is-secure
@@ -113,11 +113,26 @@
   vars:
     region: us-east-1
   tasks:
+  - name: create a security group for the elb
+    ec2_group:
+      state: present
+      name: vineet-is-secure-elb
+      description: vineet is a hulk bouncer!
+      region: "{{region}}"
+      vpc_id: "{{ec2vpc.vpc_id}}"
+      rules:
+        - proto: tcp
+          type: http
+          from_port: 80
+          to_port: 80
+          cidr_ip: 0.0.0.0/0
+    register: ec2elbgroup
   - name: create elastic load balancer (elb)
     ec2_elb_lb:
       name: "Demo-ELB"
       subnets: ["{{ec2vpc.subnets[0].id}}"]
       region: "{{region}}"
+      security_group_ids: ["{{ec2group.group_id}}", "{{ec2elbgroup.group_id}}"]
       health_check:
         ping_protocol: http
         ping_port: 3000
