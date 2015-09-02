@@ -53,5 +53,24 @@
       state: absent
       resource_tags: { "Name": "Demo-VPC", "env": "dev" }
       cidr_block: 10.0.0.0/16
+      subnets:
+        - cidr: 10.0.1.0/24
+          az: us-east-1a
+          resource_tags: { "env":"dev", "tier" : "web" }
+        - cidr: 10.0.2.0/24
+          az: us-east-1c
+          resource_tags: { "env":"dev", "tier" : "app" }
+        - cidr: 10.0.3.0/24
+          az: us-east-1d
+          resource_tags: { "env":"dev", "tier" : "db" }
+      route_tables:
+        - subnets:
+            - 10.0.1.0/24
+            - 10.0.2.0/24
+            - 10.0.3.0/24
+          routes:
+            - dest: 0.0.0.0/0
+              gw: igw
+          resource_tags: { "Name": "Demo-VPC-routes", "env": "dev" }
       region: "{{region}}"
 

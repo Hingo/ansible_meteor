@@ -36,6 +36,7 @@
           routes:
             - dest: 0.0.0.0/0
               gw: igw
+          resource_tags: { "Name": "Demo-VPC-routes", "env": "dev" }
     register: ec2vpc
   - name: create a security group for the vpc
     ec2_group:
