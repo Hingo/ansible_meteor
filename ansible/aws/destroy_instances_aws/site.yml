@@ -41,6 +41,13 @@
       description: vineet is a hulk bouncer!
       region: "{{region}}"
     register: ec2group
+  - name: destroy the "vineet-is-secure-elb" security group
+    ec2_group:
+      state: absent
+      name: vineet-is-secure-elb
+      description: vineet is a hulk bouncer!
+      region: "{{region}}"
+    register: ec2groupelb
   - name: destroy the "env:dev" virtual private cloud (vpc)
     ec2_vpc:
       state: absent
