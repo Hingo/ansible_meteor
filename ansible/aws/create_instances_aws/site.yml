@@ -91,7 +91,6 @@
     get_url: url=https://install.meteor.com/ dest=/home/ubuntu/meteor_install
   - name: install meteor
     command: sh /home/ubuntu/meteor_install
-    sudo: true
   - name: install git client
     apt: name=git update_cache=yes
     sudo: true
@@ -99,7 +98,6 @@
     git: repo=https://github.com/Hingo/ansible_meteor.git dest=/home/ubuntu/ansible_meteor/
   - name: build meteor example app
     command: chdir=/home/ubuntu/ansible_meteor/todo_example_app/ meteor update
-    sudo: true
   - name: copy startup meteor app service
     copy: src=meteor-app.conf dest=/etc/init/
     sudo: true
