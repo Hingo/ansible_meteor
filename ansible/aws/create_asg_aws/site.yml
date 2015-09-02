@@ -3,141 +3,16 @@
   hosts: localhost
   connection: local
   gather_facts: False
-  vars:
-    key_name: vineet-michael-ansible
-    instance_type: t2.micro
-    image: ami-fff87e94
-    region: us-east-1
+  vars_files:
+    - vars/common.yml
   tasks:
   - name: install boto
     pip: name=boto
-  - name: create a virtual private cloud (vpc)
-    ec2_vpc:
-      state: present
-      cidr_block: 10.0.0.0/16
-      internet_gateway: yes
-      region: "{{region}}"
-      resource_tags: { "Name": "Demo-ASG", "env": "dev" }
-      subnets:
-        - cidr: 10.0.1.0/24
-          az: us-east-1a
-          resource_tags: { "env":"dev", "tier" : "web" }
-        - cidr: 10.0.2.0/24
-          az: us-east-1c
-          resource_tags: { "env":"dev", "tier" : "app" }
-        - cidr: 10.0.3.0/24
-          az: us-east-1d
-          resource_tags: { "env":"dev", "tier" : "db" }
-      route_tables:
-        - subnets:
-            - 10.0.1.0/24
-            - 10.0.2.0/24
-            - 10.0.3.0/24
-          routes:
-            - dest: 0.0.0.0/0
-              gw: igw
-    register: ec2vpc
-  - name: create a security group
-    ec2_group:
-      state: present
-      name: vineet-is-secure-asg
-      description: vineet is a hulk bouncer!
-      region: "{{region}}"
-      vpc_id: "{{ec2vpc.vpc_id}}"
-      rules:
-        - proto: tcp
-          type: ssh
-          from_port: 22
-          to_port: 22
-          cidr_ip: 0.0.0.0/0
-        - proto: tcp
-          type: http
-          from_port: 8080
-          to_port: 8080
-          cidr_ip: 0.0.0.0/0
-    register: ec2group
-  - name: create a security group for the elb
-    ec2_group:
-      state: present
-      name: vineet-is-secure-asg-elb
-      description: vineet is a hulk bouncer!
-      region: "{{region}}"
-      vpc_id: "{{ec2vpc.vpc_id}}"
-      rules:
-        - proto: tcp
-          type: http
-          from_port: 80
-          to_port: 80
-          cidr_ip: 0.0.0.0/0
-    register: ec2elbgroup
-  - name: create elastic load balancer (elb)
-    ec2_elb_lb:
-      name: "Demo-ASG-ELB"
-      subnets: ["{{ec2vpc.subnets[0].id}}"]
-      region: "{{region}}"
-      security_group_ids: ["{{ec2group.group_id}}", "{{ec2elbgroup.group_id}}"]
-      health_check:
-        ping_protocol: http
-        ping_port: 8080
-        ping_path: "/"
-        response_timeout: 5
-        interval: 30
-        unhealthy_threshold: 2
-        healthy_threshold: 2
-      listeners:
-        - protocol: http
-          load_balancer_port: 80
-          instance_port: 8080
-      state: present
-  - name: create aws ec2 launch configuration
-    ec2_lc:
-      name: Demo-ASG-LC
-      key_name: "{{key_name}}"
-      security_groups: ["{{ec2group.group_id}}"]
-      instance_type: "{{instance_type}}"
-      image_id: "{{image}}"
-      region: "{{region}}"
-      assign_public_ip: yes
-      state: present
-    register: ec2lc 
-  - name: create aws ec2 auto scaler
-    ec2_asg:
-      name: "Demo-ASG"
-      min_size: 1
-      max_size: 5
-      launch_config_name: Demo-ASG-LC
-      load_balancers: ["Demo-ASG-ELB"]
-      health_check_type: ELB
-      vpc_zone_identifier: ["{{ec2vpc.subnets[0].id}}"]
-      tags: 
-        - env: "dev"
-      region: "{{region}}"
-      state: present
-    register: ec2asg
-  - name: define aws ec2 auto scale up policy
-    ec2_scaling_policy:
-      name: "Demo-ASG-Scale-Up"
-      asg_name: "Demo-ASG"
-      scaling_adjustment: 1
-      min_adjustment_step: 1
-      adjustment_type: "ChangeInCapacity"
-      cooldown: 3000
-      region: "{{region}}"
-      state: present
-    register: ec2asgpolicy
-  - name: define aws ec2 auto scaling alarm/trigger
-    ec2_metric_alarm:
-      name: "Demo-ASG-CPU-high-alarm"
-      alarm_actions: ["{{ ec2asgpolicy.arn }}"]
-      dimensions: {"AutoScalingGroupName":"Demo-ASG"}
-      metric: "CPUUtilization"
-      namespace: "AWS/EC2"
-      statistic: Average
-      comparison: ">="
-      threshold: 90.0
-      unit: "Percent"
-      period: 60
-      evaluation_periods: 2
-      region: "{{region}}"
-      state: present
-    register: ec2asgalarm
+  - include: tasks/vpc.yml
+  - include: tasks/security-groups.yml
+  - include: tasks/elb.yml
+  - include: tasks/asg.yml
+  - name: waiting for elb endpoint to become available
+    wait_for: host={{ ec2elb.elb.dns_name }} port=80 delay=10 timeout=300 state=started
+  - name: Visit the elb endpoint in your browser
+    debug: msg="You can reach your metricStorageService deployment at {{ ec2elb.elb.dns_name }}"

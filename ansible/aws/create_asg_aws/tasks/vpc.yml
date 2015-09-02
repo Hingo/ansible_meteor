@@ -1,0 +1,27 @@
+---
+  - name: create a virtual private cloud (vpc)
+    ec2_vpc:
+      state: present
+      cidr_block: 10.0.0.0/16
+      internet_gateway: yes
+      region: "{{region}}"
+      resource_tags: { "Name": "Demo-ASG-VPC", "env": "dev" }
+      subnets:
+        - cidr: 10.0.1.0/24
+          az: us-east-1a
+          resource_tags: { "env":"dev", "tier" : "web" }
+        - cidr: 10.0.2.0/24
+          az: us-east-1c
+          resource_tags: { "env":"dev", "tier" : "app" }
+        - cidr: 10.0.3.0/24
+          az: us-east-1d
+          resource_tags: { "env":"dev", "tier" : "db" }
+      route_tables:
+        - subnets:
+            - 10.0.1.0/24
+            - 10.0.2.0/24
+            - 10.0.3.0/24
+          routes:
+            - dest: 0.0.0.0/0
+              gw: igw
+    register: ec2vpc

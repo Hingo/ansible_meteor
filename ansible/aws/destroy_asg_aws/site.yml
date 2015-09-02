@@ -36,12 +36,9 @@
     ec2_elb_lb:
       name: "Demo-ASG-ELB"
       region: "{{region}}"
+      purge_subnets: true
+      purge_zones: true
       state: absent
-  - name: destroy the "Demo-ELB" elastic load balancer (elb)
-    ec2_elb_lb:
-      state: absent
-      name: "Demo-ELB"
-      region: "{{region}}"
   - name: destroy a security group for the elb
     ec2_group:
       state: absent
@@ -57,7 +54,7 @@
   - name: destroy the "env:dev" virtual private cloud (vpc)
     ec2_vpc:
       state: absent
-      resource_tags: { "Name": "Demo-ASG", "env": "dev" }
+      resource_tags: { "Name": "Demo-ASG-VPC", "env": "dev" }
       cidr_block: 10.0.0.0/16
       region: "{{region}}"
 

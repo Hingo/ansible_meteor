@@ -1,0 +1,34 @@
+---
+  - name: create a security group for the vpc
+    ec2_group:
+      state: present
+      name: vineet-is-secure-asg
+      description: vineet is a hulk bouncer!
+      region: "{{region}}"
+      vpc_id: "{{ec2vpc.vpc_id}}"
+      rules:
+        - proto: tcp
+          type: ssh
+          from_port: 22
+          to_port: 22
+          cidr_ip: 0.0.0.0/0
+        - proto: tcp
+          type: http
+          from_port: 8080
+          to_port: 8080
+          cidr_ip: 0.0.0.0/0
+    register: ec2group
+  - name: create a security group for the elb
+    ec2_group:
+      state: present
+      name: vineet-is-secure-asg-elb
+      description: vineet is a hulk bouncer!
+      region: "{{region}}"
+      vpc_id: "{{ec2vpc.vpc_id}}"
+      rules:
+        - proto: tcp
+          type: http
+          from_port: 80
+          to_port: 80
+          cidr_ip: 0.0.0.0/0
+    register: ec2elbgroup

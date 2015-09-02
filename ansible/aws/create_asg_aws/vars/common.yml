@@ -1,0 +1,5 @@
+---
+key_name: vineet-michael-ansible
+instance_type: t2.micro
+image: ami-fff87e94
+region: us-east-1
