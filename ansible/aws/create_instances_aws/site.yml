@@ -4,7 +4,7 @@
   connection: local
   gather_facts: False
   vars:
-    key_name: vineet-michael-ansible
+    key_name: ansible-example
     instance_type: t2.micro
     image: ami-d05e75b8
     region: us-east-1

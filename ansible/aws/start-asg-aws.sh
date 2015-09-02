@@ -13,4 +13,4 @@ echo "**************************************************************************
 echo ""
 `ansible-vault view aws.creds`
 echo ""
-ansible-playbook create_asg_aws/site.yml -e state=present -i ./inventory/ --private-key vineet-michael-ansible.pem
+ansible-playbook create_asg_aws/site.yml -e state=present -i ./inventory/ --private-key ansible-example.pem
